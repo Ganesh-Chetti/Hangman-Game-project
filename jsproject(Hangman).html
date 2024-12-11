@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hangman</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: sans-serif;
+    }
+
+    body {
+      font-family: "Arial", sans-serif;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    /* Navigation */
+    .navigation-header {
+      background-color: rgb(73, 51, 153);
+      padding: 0 15px;
+      height: 60px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    nav {
+      width: 100%;
+      max-width: 1200px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo-container>a {
+      color: ghostwhite;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 26px;
+    }
+
+    .navigation-items {
+      display: flex;
+      gap: 40px;
+    }
+
+    .navigation-items>a {
+      color: ghostwhite;
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 16px;
+      transition: 0.4s ease-in-out;
+    }
+
+    .navigation-items>a:hover {
+      color: red;
+    }
+
+    .hamburger {
+      display: none;
+      font-size: 20px;
+      font-weight: 800;
+      color: white;
+    }
+
+    @media screen and (max-width: 768px) {
+      .hamburger {
+        display: flex;
+        cursor: pointer;
+      }
+
+      .hamburger #closeHam {
+        display: none;
+      }
+
+      .navigation-items {
+        display: none;
+        flex-direction: column;
+        align-items: center;
+        position: absolute;
+        right: 0;
+        top: 58px;
+        background-color: rgb(73, 51, 153);
+        width: 100%;
+        height: calc(100vh - 58px);
+        padding-top: 60px;
+        gap: 10vh;
+      }
+
+      .container {
+        width: 100%;
+        padding: 10px;
+        background-size: cover;
+      }
+
+      #hangmanCanvas {
+        width: 150px;
+        height: 200px;
+      }
+
+      h1 {
+        font-size: 48px;
+      }
+
+      #lettersContainer {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .letter-button {
+    font-size: 16px; 
+    padding: 10px 15px; 
+    margin: 5px;
+    width: 40px;
+    height: 40px;
+    box-sizing: border-box;
+  }
+
+      #wordContainer .letter {
+        font-size: 20px;
+        margin: 0 3px;
+        width: 20px;
+      }
+    }
+
+    @media screen and (max-width: 480px) {
+      h1 {
+        font-size: 36px;
+      }
+
+      #hangmanCanvas {
+        width: 120px;
+        height: 150px;
+      }
+
+      #wordContainer .letter {
+        font-size: 18px;
+        width: 18px;
+      }
+
+      .container {
+        padding: 8px;
+      }
+      .letter-button {
+    font-size: 14px;
+    padding: 8px 12px;
+    width: 35px;
+    height: 35px;
+    margin: 3px;
+  }
+    }
+
+    /* General Styles */
+    .container {
+      color: rgb(131, 173, 140);
+      text-align: center;
+      padding: 20px;
+      background: url("https://images.rawpixel.com/image_800/czNmcy1wcml2YXRlL3Jhd3BpeGVsX2ltYWdlcy93ZWJzaXRlX2NvbnRlbnQvbHIvcm0xOS1jYXJkLTA1LWJsZW5kaW5nc3BhY2UuanBn.jpg");
+      background-repeat: no-repeat;
+      background-size: cover;
+      box-shadow: 0 0 15px rgb(9, 9, 9);
+      height: 100%;
+      width: 100%;
+    }
+
+    h1 {
+      font-size: 72px;
+      background: -webkit-linear-gradient(rgb(235, 231, 236), rgb(31, 30, 30));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 20px;
+    }
+
+    #hangmanCanvas {
+      background: linear-gradient(to bottom, rgb(206, 134, 134), rgb(139, 179, 139), rgb(80, 80, 78));
+      border-radius: 10%;
+      display: block;
+      margin: 20px auto;
+    }
+
+    #wordContainer {
+      color: rgb(246, 243, 239);
+      display: flex;
+      justify-content: center;
+      margin: 10px 0;
+    }
+
+    .letter {
+      font-size: 24px;
+      margin: 0 5px;
+      border-bottom: 2px solid #8e8e8e;
+      width: 30px;
+      text-align: center;
+    }
+
+    #lettersContainer {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-top: 20px;
+    }
+
+    .letter-button {
+      padding: 10px;
+      margin: 5px;
+      background-color: #4caf50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      width: 40px;
+    }
+
+    .letter-button:disabled {
+      background-color: #ccc;
+      cursor: not-allowed;
+    }
+
+    #statusMessage {
+      margin-top: 20px;
+      font-size: 18px;
+    }
+
+    #restartButton {
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 18px;
+      background-color: #f44336;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    #restartButton:hover {
+      background-color: #d32f2f;
+    }
+  </style>
+</head>
+
+<body>
+  <header class="navigation-header">
+    <nav>
+      <div class="logo-container">
+        <a>Hangman Game</a>
+      </div>
+      <div class="navigation-items" id="navigation-items">
+        <a href="./signup(Hangman).html">Register</a>
+        <a href="./signup(Hangman).html">Login</a>
+      </div>
+      <div class="hamburger">
+        <span id="openHam">&#9776;</span>
+        <span id="closeHam">&#x2716;</span>
+      </div>
+    </nav>
+  </header>
+
+  <div class="container">
+    <h1>Hangman Game</h1>
+    <p id="hint">Hint: Guess the word related to programming!&#128520;</p>
+    <div id="wordContainer"></div>
+    <div id="hangman-container">
+      <canvas id="hangmanCanvas" width="200" height="250"></canvas>
+    </div>
+    <div id="lettersContainer"></div>
+    <button id="restartButton" style="display: none">Restart Game</button>
+    <p id="statusMessage"></p>
+  </div>
+  <script>
+    let openHam = document.querySelector("#openHam");
+    let closeHam = document.querySelector("#closeHam");
+    let navigationItems = document.querySelector("#navigation-items");
+
+    const hamburgerEvent = (navigation, close, open) => {
+      navigationItems.style.display = navigation;
+      closeHam.style.display = close;
+      openHam.style.display = open;
+    };
+
+    openHam.addEventListener("click", () =>
+      hamburgerEvent("flex", "block", "none")
+    );
+    closeHam.addEventListener("click", () =>
+      hamburgerEvent("none", "none", "block")
+    );
+
+    const words = [
+      "javascript",
+      "hangman",
+      "responsive",
+      "development",
+      "programming",
+    ];
+    let selectedWord;
+    let guessedLetters = [];
+    let mistakes = 0;
+    const maxMistakes = 6;
+
+    // DOM elements
+    const wordContainer = document.getElementById("wordContainer");
+    const lettersContainer = document.getElementById("lettersContainer");
+    const hangmanCanvas = document.getElementById("hangmanCanvas");
+    const ctx = hangmanCanvas.getContext("2d");
+    const statusMessage = document.getElementById("statusMessage");
+    const restartButton = document.getElementById("restartButton");
+
+    // Initialize Game
+    function initGame() {
+      // Reset state
+      guessedLetters = [];
+      mistakes = 0;
+      selectedWord = words[Math.floor(Math.random() * words.length)];
+
+      statusMessage.textContent = "";
+      restartButton.style.display = "none";
+
+      drawHangman();
+      displayWord();
+      displayLetters();
+    }
+
+    // Display hidden word
+    function displayWord() {
+      wordContainer.innerHTML = "";
+      selectedWord.split("").forEach((letter) => {
+        const letterSpan = document.createElement("span");
+        letterSpan.classList.add("letter");
+        letterSpan.textContent = guessedLetters.includes(letter)
+          ? letter
+          : "_";
+        wordContainer.appendChild(letterSpan);
+      });
+
+      const won = selectedWord
+        .split("")
+        .every((letter) => guessedLetters.includes(letter));
+      if (won) {
+        statusMessage.textContent = "You won!";
+        statusMessage.style.color = "green"
+        endGame();
+      }
+    }
+
+    // Display available letters
+    function displayLetters() {
+      lettersContainer.innerHTML = "";
+      for (let i = 65; i <= 90; i++) {
+        const letter = String.fromCharCode(i).toLowerCase();
+        const button = document.createElement("button");
+        button.classList.add("letter-button");
+        button.textContent = letter;
+        button.disabled = guessedLetters.includes(letter);
+        button.addEventListener("click", () => handleGuess(letter));
+        lettersContainer.appendChild(button);
+      }
+    }
+
+    // Handle guessed letter
+    function handleGuess(letter) {
+      guessedLetters.push(letter);
+      if (selectedWord.includes(letter)) {
+        displayWord();
+      } else {
+        mistakes++;
+        drawHangman();
+      }
+
+      if (mistakes >= maxMistakes) {
+        statusMessage.textContent = `Game over! The word was "${selectedWord}"`;
+        statusMessage.style.color = "red"
+        endGame();
+      }
+    }
+
+    // End game
+    function endGame() {
+      lettersContainer.innerHTML = "";
+      restartButton.style.display = "inline-block";
+    }
+
+    // Draw Hangman
+    function drawHangman() {
+      ctx.clearRect(0, 0, hangmanCanvas.width, hangmanCanvas.height);
+      ctx.lineWidth = 3;
+      ctx.strokeStyle = "#333";
+
+      // Draw base
+      ctx.beginPath();
+      ctx.moveTo(10, 230);
+      ctx.lineTo(190, 230);
+      ctx.stroke();
+
+      // Draw parts based on mistakes
+      if (mistakes > 0) {
+        // Pole
+        ctx.moveTo(50, 230);
+        ctx.lineTo(50, 30);
+        ctx.stroke();
+      }
+      if (mistakes > 1) {
+        // Top bar
+        ctx.lineTo(150, 30);
+        ctx.stroke();
+      }
+      if (mistakes > 2) {
+        // Rope
+        ctx.moveTo(150, 30);
+        ctx.lineTo(150, 50);
+        ctx.stroke();
+      }
+      if (mistakes > 3) {
+        // Head
+        ctx.beginPath();
+        ctx.arc(150, 70, 20, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+      if (mistakes > 4) {
+        // Body
+        ctx.moveTo(150, 90);
+        ctx.lineTo(150, 160);
+        ctx.stroke();
+      }
+      if (mistakes > 5) {
+        // Arms
+        ctx.moveTo(150, 120);
+        ctx.lineTo(130, 140);
+        ctx.moveTo(150, 120);
+        ctx.lineTo(170, 140);
+        ctx.stroke();
+      }
+      if (mistakes > 6) {
+        // Legs
+        ctx.moveTo(150, 160);
+        ctx.lineTo(130, 200);
+        ctx.moveTo(150, 160);
+        ctx.lineTo(170, 200);
+        ctx.stroke();
+      }
+    }
+
+    // Restart the game
+    restartButton.addEventListener("click", initGame);
+
+    // Initialize the game for the first time
+    initGame();
+  </script>
+</body>
+
+</html>
